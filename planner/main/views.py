@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Note
 from .forms import NoteForm
 
@@ -16,10 +16,17 @@ def index(request):
 
 def note_detail(request, note_id):
     note = Note.objects.get(pk=note_id)
+
     if request.method == 'POST':
         form = NoteForm(request.POST)
+
         if form.is_valid():
-            form.save()
+            title = form.cleaned_data['title']
+            content = form.cleaned_data['content']
+            note.title = title
+            note.content = content
+            note.save()
+            return redirect('/')
 
     return render(request, 'note_detail.html', {'note': note})
 
